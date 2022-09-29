@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MethodSum in JavaSCript through WASM</title>
+</head>
+<body>
+<script type="module">
+    import init, { MethodSum } from "./methodsum4rust.js";
+    init().then(() => {
+        console.log("done");
+    });
+    window.MethodSum = MethodSum;
+</script>
+</body>
+</html>

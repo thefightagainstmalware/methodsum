@@ -1,0 +1,21 @@
+{
+  "name": "methodsum4rust",
+  "collaborators": [
+    "PandaNinjas <admin@malwarefight.gq>"
+  ],
+  "description": "MethodSum rust implementation, used to implement js implementation through wasm",
+  "version": "0.1.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thefightagainstmalware/MethodSum"
+  },
+  "files": [
+    "methodsum4rust_bg.wasm",
+    "methodsum4rust.js",
+    "methodsum4rust.d.ts"
+  ],
+  "module": "methodsum4rust.js",
+  "types": "methodsum4rust.d.ts",
+  "sideEffects": false
+}
