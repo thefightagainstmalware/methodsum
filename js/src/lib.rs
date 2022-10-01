@@ -1,3 +1,4 @@
+use std::cmp;
 use std::ops::BitXorAssign;
 use std::fmt::Write;
 use wasm_bindgen::prelude::*;
@@ -62,7 +63,33 @@ fn to_base64(idx: &u8) -> char {
         'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'][*idx as usize];
 }
-
+fn wagner_fischer(a: &str, b: &str) -> u32 {
+    let mut matrix = vec![vec![0; b.len()]; a.len()];
+    let mut a_chars = a.chars();
+    let mut b_chars = b.chars();
+    for i in 1..=a.len() {
+        matrix[i][0] = i as u32;
+    }
+    for i in 1..=b.len() {
+        matrix[0][i] = i as u32;
+    }
+    for j in 1..b.len() {
+        for i in 1..a.len() {
+            let mut substitution_cost = 0;
+            if a_chars.nth(i) == b_chars.nth(j) {
+                substitution_cost = 1;
+            }
+            matrix[i][j] = cmp::min(
+                matrix[i - 1][j] + 1,
+                cmp::min (
+                    matrix[i][j - 1] + 1,
+                    matrix[i - 1][j - 1] + substitution_cost
+                )
+            )
+        }
+    }
+    return matrix[a.len() - 1][b.len() - 1];
+}
 #[wasm_bindgen]
 pub struct MethodSum {
     block_size: u32,
@@ -77,6 +104,27 @@ impl MethodSum {
             result: None,
             method_insn: insns
         }
+    }
+
+    pub fn compare(a: &str, b: &str) -> u32 {
+        let a_parts = a.split(":").collect::<Vec<_>>();
+        let b_parts = b.split(":").collect::<Vec<_>>();
+        let first_part_blocks: u8 = a_parts[0].parse().unwrap();
+        let second_part_blocks: u8 = b_parts[0].parse().unwrap();
+        if first_part_blocks == second_part_blocks {
+            let close= cmp::min(wagner_fischer(a_parts[1], b_parts[1]), wagner_fischer(a_parts[2], b_parts[2]));
+            let result: f64 = 100.0 - ((100.0 * 32.0 * close as f64)/(64.0 * (a.len() + b.len()) as f64));
+            return result.clamp(0.0, 100.0).floor() as u32;
+        } else if first_part_blocks == 2 * second_part_blocks {
+            let close = wagner_fischer(a_parts[1], b_parts[2]);
+            let result: f64 = 100.0 - ((100.0 * 32.0 * close as f64)/(64.0 * (a.len() + b.len()) as f64));
+            return result.clamp(0.0, 100.0).floor() as u32;
+        } else if first_part_blocks * 2 == second_part_blocks {
+            let close = wagner_fischer(a_parts[2], b_parts[1]);
+            let result: f64 = 100.0 - ((100.0 * 32.0 * close as f64)/(64.0 * (a.len() + b.len()) as f64));
+            return result.clamp(0.0, 100.0).floor() as u32;
+        }
+        return 0;
     }
 
     pub fn get_hash(&mut self) -> String {
@@ -113,9 +161,6 @@ impl MethodSum {
                 }
             }
         }
-        match &self.result {
-            None => panic!("Unreachable"),
-            Some(T) => T.to_string()
-        }
+        return self.result.as_ref().unwrap().to_string();
     }
 }
