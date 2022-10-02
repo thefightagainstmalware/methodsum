@@ -67,17 +67,17 @@ fn wagner_fischer(a: &str, b: &str) -> u32 {
     let mut matrix = vec![vec![0; b.len()]; a.len()];
     let mut a_chars = a.chars();
     let mut b_chars = b.chars();
-    for i in 1..=a.len() {
+    for i in 1..a.len() {
         matrix[i][0] = i as u32;
     }
-    for i in 1..=b.len() {
+    for i in 1..b.len() {
         matrix[0][i] = i as u32;
     }
     for j in 1..b.len() {
         for i in 1..a.len() {
-            let mut substitution_cost = 0;
+            let mut substitution_cost = 1;
             if a_chars.nth(i) == b_chars.nth(j) {
-                substitution_cost = 1;
+                substitution_cost = 0;
             }
             matrix[i][j] = cmp::min(
                 matrix[i - 1][j] + 1,
