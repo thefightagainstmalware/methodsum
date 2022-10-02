@@ -112,9 +112,8 @@ export class MethodSum {
     }
     /**
     * @param {Uint8Array} insns
-    * @returns {MethodSum}
     */
-    static init(insns) {
+    constructor(insns) {
         const ptr0 = passArray8ToWasm0(insns, wasm.__wbindgen_malloc);
         const len0 = WASM_VECTOR_LEN;
         const ret = wasm.methodsum_init(ptr0, len0);

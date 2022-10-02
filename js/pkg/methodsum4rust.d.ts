@@ -6,9 +6,8 @@ export class MethodSum {
   free(): void;
 /**
 * @param {Uint8Array} insns
-* @returns {MethodSum}
 */
-  static init(insns: Uint8Array): MethodSum;
+  constructor(insns: Uint8Array);
 /**
 * @param {string} a
 * @param {string} b

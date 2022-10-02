@@ -98,6 +98,7 @@ pub struct MethodSum {
 }
 #[wasm_bindgen]
 impl MethodSum {
+    #[wasm_bindgen(constructor)]
     pub fn init(insns: Vec<u8>) -> MethodSum {
         MethodSum {
             block_size: 32 * 2_u32.pow((insns.len() as f64 / (32.0 * 16.0)).log2().floor() as u32),
@@ -151,8 +152,13 @@ impl MethodSum {
                             h2 = FNVHash::init();
                         }
                     }
+
                     if sig1.len() < 16 { // 32 (S)/ 2
+                        if self.block_size == 1 {
+                            panic!("Can't halve the block size any more");
+                        }
                         self.block_size = self.block_size / 2;
+
                     } else {
                         done = true;
                         let result = format!("{}:{}:{}", self.block_size, sig1, sig2);
